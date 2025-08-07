@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fourmilière Royale 🐜👑</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d4a3e 100%);
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+    
+    #welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d4a3e 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    
+    .welcome-container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .welcome-title {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #FFD700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    
+    .welcome-subtitle {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+    
+    .game-description {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    
+    .game-description h3 {
+      color: #4CAF50;
+      margin-top: 0;
+    }
+    
+    .game-description ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .game-description li {
+      margin: 5px 0;
+    }
+    
+    .setup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+    
+    .form-group label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #FFD700;
+    }
+    
+    .form-group input {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+    }
+    
+    .form-group input::placeholder {
+      color: #aaa;
+    }
+    
+    .start-button {
+      background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    
+    .start-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+    }
+    
+    .demo-button {
+      background: linear-gradient(45deg, #2196F3, #1976D2);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    
+    .demo-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(33, 150, 243, 0.4);
+    }
+    
+    .help-text {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-top: 20px;
+      line-height: 1.4;
+    }
+    
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+    }
+    
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      min-width: 300px;
+    }
+    
+    #queen-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      min-width: 250px;
+    }
+    
+    .resource {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+    
+    .resource-bar {
+      width: 150px;
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .resource-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    .food-fill { background: #4CAF50; }
+    .materials-fill { background: #FF9800; }
+    .health-fill { background: #F44336; }
+    .population-fill { background: #2196F3; }
+    
+    .phase-indicator {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    
+    .day { background: #FFD700; color: #000; }
+    .night { background: #2C3E50; color: #fff; }
+    
+    .queen-button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      background: #9C27B0;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .queen-button:hover {
+      background: #7B1FA2;
+    }
+    
+    .queen-button:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+    
+    #events-feed {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 400px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .event-item {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #4CAF50;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    #players-list {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 300px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .player-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 3px 0;
+      padding: 3px;
+    }
+    
+    .role-ouvriere { color: #4CAF50; }
+    .role-soldat { color: #F44336; }
+    .role-exploratrice { color: #FF9800; }
+    .role-soigneuse { color: #2196F3; }
+    
+    .ant-colony-visualization {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 60%;
+      background: rgba(45, 74, 62, 0.3);
+      border-radius: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2em;
+      color: #FFD700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <!-- Page d'accueil -->
+  <div id="welcome-screen">
+    <div class="welcome-container">
+      <h1 class="welcome-title">🐜 Fourmilière Royale 👑</h1>
+      <p class="welcome-subtitle">Jeu interactif pour streamers Twitch</p>
+      
+      <div class="game-description">
+        <h3>🎮 Comment ça marche ?</h3>
+        <ul>
+          <li><strong>Vous êtes la Reine</strong> - Contrôlez la fourmilière depuis votre navigateur</li>
+          <li><strong>Vos viewers sont des fourmis</strong> - Ils utilisent des commandes chat</li>
+          <li><strong>4 rôles disponibles</strong> - Ouvrière, Soldat, Exploratrice, Soigneuse</li>
+          <li><strong>Cycle jour/nuit</strong> - 60 secondes par phase</li>
+          <li><strong>Ressources à gérer</strong> - Nourriture, Matériaux, Population, Santé</li>
+        </ul>
+      </div>
+      
+      <form class="setup-form" id="setup-form">
+        <div class="form-group">
+          <label for="channel-name">📺 Nom de votre chaîne Twitch</label>
+          <input type="text" id="channel-name" placeholder="ex: votre_nom" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="twitch-username">👤 Votre nom d'utilisateur Twitch</label>
+          <input type="text" id="twitch-username" placeholder="ex: votre_username" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="oauth-token">🔑 Token OAuth (optionnel)</label>
+          <input type="password" id="oauth-token" placeholder="oauth:xxxx (depuis twitchapps.com/tmi/)">
+        </div>
+        
+        <button type="submit" class="start-button">🚀 Démarrer la Fourmilière</button>
+        <button type="button" class="demo-button" id="demo-button">🎭 Mode Démonstration</button>
+      </form>
+      
+      <div class="help-text">
+        <p><strong>💡 Conseil :</strong> Si vous n'avez pas de token OAuth, le jeu fonctionnera en mode démonstration.</p>
+        <p><strong>🔗 Obtenir un token :</strong> <a href="https://twitchapps.com/tmi/" target="_blank" style="color: #4CAF50;">twitchapps.com/tmi/</a></p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Interface de jeu -->
+  <div id="game-container">
+    <!-- Visualisation de la fourmilière -->
+    <div class="ant-colony-visualization">
+      🏗️ Fourmilière Royale<br>
+      <small>Visualisation en cours de chargement...</small>
+    </div>
+    
+    <div id="hud">
+      <h3>🐜 Fourmilière Royale</h3>
+      <div class="resource">
+        <span>🍎 Nourriture:</span>
+        <span id="food-value">50</span>
+      </div>
+      <div class="resource">
+        <span>🔨 Matériaux:</span>
+        <span id="materials-value">20</span>
+      </div>
+      <div class="resource">
+        <span>👥 Population:</span>
+        <span id="population-value">10</span>
+      </div>
+      <div class="resource">
+        <span>❤️ Santé:</span>
+        <span id="health-value">100</span>
+      </div>
+      <div class="resource-bar">
+        <div id="health-bar" class="resource-fill health-fill" style="width: 100%"></div>
+      </div>
+      <div id="phase-indicator" class="phase-indicator day">
+        Jour 1 - 60s
+      </div>
+    </div>
+    
+    <div id="queen-controls">
+      <h3>👑 Actions de la Reine</h3>
+      <button id="pondre-btn" class="queen-button">🥚 Pondre</button>
+      <button id="ordre-btn" class="queen-button">📢 Ordre</button>
+      <button id="boost-btn" class="queen-button">⚡ Boost</button>
+      
+      <div id="pondre-menu" style="display: none; margin-top: 10px;">
+        <button class="queen-button" data-role="ouvriere">Ouvrière</button>
+        <button class="queen-button" data-role="soldat">Soldat</button>
+        <button class="queen-button" data-role="exploratrice">Exploratrice</button>
+        <button class="queen-button" data-role="soigneuse">Soigneuse</button>
+      </div>
+      
+      <div id="ordre-menu" style="display: none; margin-top: 10px;">
+        <button class="queen-button" data-priority="food">🍎 Nourriture</button>
+        <button class="queen-button" data-priority="build">🔨 Construction</button>
+        <button class="queen-button" data-priority="defense">🛡️ Défense</button>
+      </div>
+    </div>
+    
+    <div id="events-feed">
+      <h4>📰 Événements récents</h4>
+      <div id="events-list"></div>
+    </div>
+    
+    <div id="players-list">
+      <h4>👥 Joueurs actifs</h4>
+      <div id="players-list-content"></div>
+    </div>
+  </div>
+  
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

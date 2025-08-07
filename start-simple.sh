@@ -1,0 +1,56 @@
+#!/bin/bash
+
+echo "🌐 Fourmilière Royale - Démarrage Simplifié"
+echo "============================================"
+
+# Vérifier Node.js
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js n'est pas installé"
+    exit 1
+fi
+
+echo "✅ Node.js $(node -v) détecté"
+
+# Créer .env si nécessaire
+if [ ! -f .env ]; then
+    echo "📝 Création du fichier .env..."
+    cp env.example .env
+    echo "✅ Fichier .env créé"
+fi
+
+# Installer les dépendances si nécessaire
+if [ ! -d "node_modules" ]; then
+    echo "📦 Installation des dépendances serveur..."
+    npm install
+fi
+
+if [ ! -d "client/node_modules" ]; then
+    echo "📦 Installation des dépendances client..."
+    cd client && npm install && cd ..
+fi
+
+echo ""
+echo "🚀 Démarrage des services..."
+echo "📱 Interface web: http://localhost:5173"
+echo "🔌 WebSocket: ws://localhost:8080"
+echo "📊 Dashboard: http://localhost:5173/healthz"
+echo ""
+echo "⏳ Attendez 10-15 secondes que les services démarrent..."
+echo "⏹️  Appuyez sur Ctrl+C pour arrêter"
+echo ""
+
+# Démarrer le serveur en arrière-plan
+echo "🔧 Démarrage du serveur backend..."
+npm run server &
+SERVER_PID=$!
+
+# Attendre un peu
+sleep 5
+
+# Démarrer le client en arrière-plan
+echo "🎮 Démarrage du client frontend..."
+cd client && npm run dev &
+CLIENT_PID=$!
+
+# Attendre que les processus se terminent
+wait $SERVER_PID $CLIENT_PID
