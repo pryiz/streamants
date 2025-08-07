@@ -7,6 +7,7 @@
     "predev": "node check-version.js",
     "dev": "concurrently \"npm run server\" \"npm run client:dev\"",
     "build": "npm run client:build",
+    "build:dev": "cd client && vite build --mode development",
     "serve": "npm run client:serve",
     "server": "node server/server.js",
     "client:dev": "cd client && npm run dev",
